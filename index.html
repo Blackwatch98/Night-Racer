@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Nauka jazdy</title>
+	<style>
+		body { margin: 0; padding: 0; font-size: 0;}
+		canvas { width: 100%; height: 100%; }
+	</style>
+</head>
+<body>
+
+    
+<link rel="stylesheet" type="text/css" href="css/PopUp.css">
+<script src="js/three.min.js"></script>
+<script src='js/OBJLoader.js'></script>
+
+<script>
+	var WIDTH = window.innerWidth;
+	var HEIGHT = window.innerHeight;
+
+document.addEventListener('keydown',onDocumentKeyDown,false);
+document.addEventListener('keyup',onDocumentKeyUp,false);
+    
+function onDocumentKeyDown(event){
+event = event || window.event;
+var keycode = event.keyCode;
+switch(keycode){
+case 37 : console.log("left down"); key_left = true; break;
+case 38 : console.log("up down"   );key_up = true;break;
+case 39 : console.log("right down"); key_right = true; break;
+case 40 : console.log("down down" );key_down=true;break;
+}
+}
+function onDocumentKeyUp(event){
+event = event || window.event;
+var keycode = event.keyCode;
+switch(keycode){
+case 37 : console.log("left up" );key_left = false; break;
+case 38 : console.log("up up"   );key_up = false; break;
+case 39 : console.log("right up");key_right = false; break;
+case 40 : console.log("down up" );key_down = false; break;
+}
+}        
+     var cube = null;
+
+	var renderer = new THREE.WebGLRenderer({antialias:true});
+	renderer.setSize(WIDTH, HEIGHT);
+	renderer.setClearColor(0xDDDDDD, 1);
+	document.body.appendChild(renderer.domElement);
+
+	var scene = new THREE.Scene();
+    
+	var camera = new THREE.PerspectiveCamera(50, WIDTH/HEIGHT, 0.1, 10000);
+	camera.position.z = 50; //50
+    //camera.position.y = 10;
+	scene.add(camera);
+
+	var Texture = new THREE.TextureLoader().load( "images/road1.jpg" ); 
+    Texture.wrapS = THREE.RepeatWrapping; 
+    Texture.wrapT = THREE.RepeatWrapping; 
+    Texture.repeat.set( 2, 40 );
+
+    var Material = new THREE.MeshBasicMaterial( { map: Texture, side: THREE.DoubleSide } );
+    var Geometry = new THREE.PlaneGeometry(50, 1000, 1, 1);
+    var plane = new THREE.Mesh(Geometry, Material); 
+    plane.rotation.set(90, 0, 0); //90
+    plane.material.map.offset.x = 1.5;
+    scene.add(plane);
+
+    //BACKGROUND
+    var texture = THREE.ImageUtils.loadTexture( 'images/niebo.jpg' );
+        var backgroundMesh = new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2, 0),
+            new THREE.MeshBasicMaterial({
+                map: texture
+            }));
+
+    backgroundMesh .material.depthTest = false;
+    backgroundMesh .material.depthWrite = false;
+
+    // Create your background scene
+    var backgroundScene = new THREE.Scene();
+    var backgroundCamera = new THREE.Camera();
+    backgroundScene .add(backgroundCamera );
+    backgroundScene .add(backgroundMesh );
+    
+    //MURKI
+    var texture = THREE.ImageUtils.loadTexture( 'images/mur.jpeg' );
+    var boxGeometry = new THREE.BoxGeometry(10, 7, 2);
+	var phongMaterial = new THREE.MeshPhongMaterial({map: texture});
+	var wall = new THREE.Mesh(boxGeometry, phongMaterial);
+    wall.position.y = 60;
+    wall.position.z = -110;
+	wall.rotation.set(0.5, 0, 0);
+	scene.add(wall);
+    
+    var boxGeometry = new THREE.BoxGeometry(10, 7, 2);
+	var phongMaterial = new THREE.MeshPhongMaterial({map: texture});
+	var wall2 = new THREE.Mesh(boxGeometry, phongMaterial);
+	wall2.position.y = 20;
+    wall2.position.z = -30;
+    wall2.position.x = 15;
+	wall2.rotation.set(0.5, 0, 0);
+	scene.add(wall2);
+    
+    var boxGeometry = new THREE.BoxGeometry(10, 7, 2);
+	var phongMaterial = new THREE.MeshPhongMaterial({map: texture});
+	var wall3 = new THREE.Mesh(boxGeometry, phongMaterial);
+	wall3.position.y = -5;
+    wall3.position.z = 20;
+    wall3.position.x = -15;
+	wall3.rotation.set(0.5, 0, 0);
+	scene.add(wall3);
+    
+    var texture = THREE.ImageUtils.loadTexture( 'images/vic.png' );
+    var boxGeometry = new THREE.BoxGeometry(40, 10, 20);
+	var phongMaterial = new THREE.MeshPhongMaterial({map: texture});
+	var wall4 = new THREE.Mesh(boxGeometry, phongMaterial);
+	wall4.position.y = -15;
+    wall4.position.z = 0;
+    if(wall.position.z < 0)
+    {
+        wall.position.z += 0.1;
+    }
+    wall4.position.x = 0;
+	wall4.rotation.set(0.5, 0, 0);
+	scene.add(wall4);
+
+    //SYGNALIZATOR
+
+    
+    var boxGeometry = new THREE.BoxGeometry(5, 10, 10);
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0x000000});
+	var wall5 = new THREE.Mesh(boxGeometry, phongMaterial);
+	wall5.position.y = 14;
+    wall5.position.z = 0;
+    wall5.position.x = 0;
+	wall5.rotation.set(0.5, 0, 0);
+	scene.add(wall5);
+    
+    var boxGeometry = new THREE.CylinderGeometry( 1, 1, 1, 32 );
+	var phongMaterial = new THREE.MeshPhongMaterial({color:  0xFF0000});
+	var red = new THREE.Mesh(boxGeometry, phongMaterial);
+	red.position.y = 14;
+    red.position.z = 0;
+    
+    red.position.x = 0;
+    red.rotation.set(2, 0, 0);
+	scene.add(red);
+    
+    
+    var boxGeometry = new THREE.CylinderGeometry( 1, 1, 1, 32 );
+	var phongMaterial = new THREE.MeshPhongMaterial({color:  0xFFF406});
+	var yellow = new THREE.Mesh(boxGeometry, phongMaterial);
+	yellow.position.y = 11.5;
+    yellow.position.z = 0;
+    yellow.position.x = 0;
+    yellow.rotation.set(2, 0, 0);
+	scene.add(yellow);
+    
+
+    var boxGeometry = new THREE.CylinderGeometry( 1, 1, 1, 32 );
+	var phongMaterial = new THREE.MeshPhongMaterial({color:  0x00ff0c});
+	var green = new THREE.Mesh(boxGeometry, phongMaterial);
+	green.position.y = 9;
+    green.position.z = 0;
+    green.position.x = 0;
+	green.rotation.set(2, 0, 0);
+	scene.add(green);
+    
+    
+    //COINSY
+    var texture = THREE.ImageUtils.loadTexture( 'images/zloto.jfif' );
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin = new THREE.Mesh( geometry, material );
+    coin.position.y = 0;
+    coin.position.x = -8;
+    coin.position.z = 6;
+    coin.rotation.set(2, 0, 0);
+    scene.add( coin );
+    
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin2 = new THREE.Mesh( geometry, material );
+    coin2.position.y = 19;
+    coin2.position.z = -30;
+    coin2.rotation.set(2, 0, 0);
+    scene.add( coin2 );
+    
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin3 = new THREE.Mesh( geometry, material );
+    coin3.position.y = 43;
+    coin3.position.z = -80;
+    coin3.position.x = 10;
+    coin3.rotation.set(2, 0, 0);
+    scene.add( coin3 );
+    
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin4 = new THREE.Mesh( geometry, material );
+    coin4.position.z = -60;
+    coin4.position.y = 33;
+    coin4.position.x = -10;
+    coin4.rotation.set(2, 0, 0);
+    scene.add( coin4 );
+    
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin5 = new THREE.Mesh( geometry, material );
+    coin5.position.y = 8;
+    coin5.position.z = -10;
+    coin5.position.x = -5;
+    coin5.rotation.set(2, 0, 0);
+    scene.add( coin5 );
+    
+    var geometry = new THREE.CylinderGeometry( 2.5, 2.5, 1, 15 );
+    var material = new THREE.MeshBasicMaterial( {map: texture} );
+    var coin6 = new THREE.Mesh( geometry, material );
+    coin6.position.y = 13;
+    coin6.position.z = -20;
+    coin6.position.x = 10;
+    coin6.rotation.set(2, 0, 0);
+    scene.add( coin6 );
+    
+    var clock = new THREE.Clock;
+    dt=clock.getDelta();
+
+    //MUZYKA
+    
+    // instantiate a listener
+    var audioListener = new THREE.AudioListener();
+
+    // add the listener to the camera
+    camera.add( audioListener );
+
+    // instantiate audio object
+    var oceanAmbientSound = new THREE.Audio( audioListener );
+
+    // add the audio object to the scene
+    scene.add( oceanAmbientSound );
+
+    // instantiate a loader
+    var loader = new THREE.AudioLoader();
+
+    // load a resource
+    loader.load(
+	// resource URL
+	'audio/tokyo.ogg',
+
+	// onLoad callback
+	function ( audioBuffer ) {
+		// set the audio object buffer to the loaded object
+		oceanAmbientSound.setBuffer( audioBuffer );
+
+		// play the audio
+		oceanAmbientSound.play();
+	});
+    
+    //AUTKO
+    
+    var objLoader = new THREE.OBJLoader();
+    objLoader.load('images/ech.obj', function (object) {
+        object.scale.set(0.05,0.05,0.05)
+        object.position.y = -8;
+        object.position.z = 20;
+        
+        object.rotation.x = 0.4;
+        scene.add(object);
+        cube = object;
+        
+    });
+    
+    
+    
+    
+    var cube = new THREE.Mesh(boxGeometry, phongMaterial);
+    /*
+    var boxGeometry = new THREE.BoxGeometry(2, 2, 4);
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xFF0000});
+
+    
+	cube.position.y = -8;
+    cube.position.z = 20;
+	cube.rotation.set(0.2, 0, 0);
+	scene.add(cube);
+    */
+    var boxGeometry = new THREE.BoxGeometry(2, 2, 4);
+	var phongMaterial = new THREE.MeshPhongMaterial({color: 0xFF0000});
+	var srodek = new THREE.Mesh(boxGeometry, phongMaterial);
+	srodek.position.set(0, 0, 0);
+	scene.add(srodek);
+    
+	var light = new THREE.PointLight(0xFFFFFF);
+	light.position.set(-10, 15, 50);
+	scene.add(light);
+	
+    var time = 0;
+	var key_left;
+	var key_right;
+	var key_up;
+	var key_down;
+	
+	var speed = 0;
+    var skręt = 0.4;
+    var dx = 0.0005;
+    var t = 1;
+    var b = 1;
+    var score = 0;
+    
+    function spawn(element)
+    {
+        var pozycja = Math.floor((Math.random() * (15 - -15)) - 15);  
+        element.position.x = pozycja;
+        element.position.y = 90;
+        element.position.z = -170;
+        
+    }
+    
+    cube.rotation.y = 3.15;
+    
+	function render() 
+    {	
+        if(red.position.z < 8)
+        {
+            red.position.z += 0.1;
+        }
+        else if(yellow.position.z < 8)
+        {
+            yellow.position.z += 0.1;
+        }
+        else if(green.position.z < 8)
+        {
+            green.position.z += 0.1;
+        }
+        else
+        {
+            scene.remove(wall5);
+            scene.remove(red);
+            scene.remove(yellow);
+            scene.remove(green);
+            var flag = 1;
+        }
+        
+        if(flag == 1)
+        {
+            if(key_up)
+            {
+                if(speed <= 0.05)
+                {
+                    speed += dx;
+
+                    b = 1;
+
+                }
+
+            }
+            if(key_down)
+            {
+                if(b == 0)
+                {
+                    b == 0.004;
+                }
+                b -= 0.0004;
+            }
+
+            if(score == 1000)
+            {
+
+                if(wall4.position.y < 5)    
+                wall4.position.y += 0.1;
+                speed = 0;
+                skręt = 0;
+
+
+            }
+
+            if(key_right)
+            {
+                if(camera.position.x < 17)
+                {
+                    camera.position.x += skręt;
+                    cube.position.x += skręt;
+                }
+
+                if(cube.rotation.y >= -0.45 && score != 10)
+                cube.rotation.y -= 0.05;
+            }
+            else
+            {
+                if(cube.rotation.y < 0)
+                cube.rotation.y += 0.05;
+            }
+
+
+            if(key_left)
+            {
+                if(camera.position.x > -17)
+                {
+                    camera.position.x -= skręt;
+                    cube.position.x -= skręt;
+                }
+
+                if(cube.rotation.y <= 0.45 && score != 10)
+                cube.rotation.y += 0.05;
+            }
+            else
+            {
+                if(cube.rotation.y > 0)
+                cube.rotation.y -= 0.05;
+            }
+        }
+        
+        //TUTAJ MA SIE KONCZYC GRA
+        if(wall.position.z <= (cube.position.z + 4) && wall.position.z >= (cube.position.z - 4))
+        if(cube.position.x <= (wall.position.x + 7) && cube.position.x >= (wall.position.x - 7))
+        {
+           window.location.reload();
+        }
+        
+        if(wall2.position.z <= (cube.position.z + 4) && wall2.position.z >= (cube.position.z - 4))
+        if(cube.position.x <= (wall2.position.x + 7) && cube.position.x >= (wall2.position.x - 7))
+        {
+           window.location.reload();
+        }
+        
+        if(wall3.position.z <= (cube.position.z + 4) && wall3.position.z >= (cube.position.z - 4))
+        if(cube.position.x <= (wall3.position.x + 7) && cube.position.x >= (wall3.position.x - 7))
+        {
+           window.location.reload();
+        }
+        
+        if(wall.position.z <= 40 && wall.position.z >= 30)
+            spawn(wall);
+        
+        if(wall2.position.z <= 40 && wall2.position.z >= 30)
+            spawn(wall2);
+        
+        if(wall3.position.z <= 40 && wall3.position.z >= 30)
+            spawn(wall3);
+        
+        speed *= t*b;
+        
+        if(key_up == false)
+        b -= 0.00004;
+        
+        var predkosc = speed*1000*2;
+        predkosc = predkosc.toFixed(1)
+        
+        
+        if(coin.position.z <= 40 && coin.position.z >= 30)
+        {
+            spawn(coin);
+        }
+            
+        
+        if(coin2.position.z <= 40 && coin2.position.z >= 30)
+            spawn(coin2);
+
+        
+        if(coin3.position.z <= 40 && coin3.position.z >= 30)
+            spawn(coin3);
+        
+        if(coin4.position.z <= 40 && coin4.position.z >= 30)
+        {
+            spawn(coin4);
+        }
+            
+        
+        if(coin5.position.z <= 40 && coin5.position.z >= 30)
+            spawn(coin5);
+
+        
+        if(coin6.position.z <= 40 && coin6.position.z >= 30)
+            spawn(coin6);
+        
+        
+        if(coin.position.z <= (cube.position.z + 5) && coin.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin.position.x + 3) && cube.position.x >= (coin.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin);
+        }
+        
+        if(coin2.position.z <= (cube.position.z + 5) && coin2.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin2.position.x + 3) && cube.position.x >= (coin2.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin2);
+        }
+        
+        if(coin3.position.z <= (cube.position.z + 5) && coin3.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin3.position.x + 3) && cube.position.x >= (coin3.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin3);
+        }
+        
+        if(coin4.position.z <= (cube.position.z + 5) && coin4.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin4.position.x + 3) && cube.position.x >= (coin4.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin4);
+        }
+        
+        if(coin5.position.z <= (cube.position.z + 5) && coin5.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin5.position.x + 3) && cube.position.x >= (coin5.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin5);
+        }
+        
+        if(coin6.position.z <= (cube.position.z + 5) && coin6.position.z >= (cube.position.z - 5))
+        if(cube.position.x <= (coin6.position.x + 3) && cube.position.x >= (coin6.position.x - 3))
+        {
+            if(predkosc > 50)
+            score += 10;
+            spawn(coin6);
+        }
+        
+        
+        
+        plane.material.map.offset.y -= speed;
+        
+		wall.position.z += speed*20;
+        wall.position.y -= speed*10;
+        wall2.position.z += speed*20;
+        wall2.position.y -= speed*10;
+        wall3.position.z += speed*20;
+        wall3.position.y -= speed*10;
+        
+        coin.position.z += speed*20;
+        coin.position.y -= speed*10;
+        coin2.position.z += speed*20;
+        coin2.position.y -= speed*10;
+        coin3.position.z += speed*20;
+        coin3.position.y -= speed*10;
+        coin4.position.z += speed*20;
+        coin4.position.y -= speed*10;
+        coin5.position.z += speed*20;
+        coin5.position.y -= speed*10;
+        coin6.position.z += speed*20;
+        coin6.position.y -= speed*10;
+		
+        if(flag == 1)
+        time += 0.015;
+        
+        var czas = time.toFixed(2);
+		requestAnimationFrame(render);
+		document.getElementById("licznik").innerHTML=score; //speed
+        document.getElementById("speed").innerHTML=predkosc; //speed
+        
+        if(score != 1000)
+        document.getElementById("czas").innerHTML=czas;
+        renderer.autoClear = false;
+        renderer.clear();
+        renderer.render(backgroundScene , backgroundCamera );
+        renderer.render(scene, camera);
+        
+        
+        coin.rotation.z += 0.05;
+        coin2.rotation.z += 0.05;
+        coin3.rotation.z += 0.05;
+        coin4.rotation.z += 0.05;
+        coin5.rotation.z += 0.05;
+        coin6.rotation.z += 0.05;
+        
+        
+	}
+    
+    if(cube)
+	render();
+</script>
+              
+<div style="position: fixed; top: 10px; right: 50px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 40px;">Twój czas: </div>
+<div id="czas" style="position: fixed; top: 60px; right: 70px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 40px;"></div>
+<div style="position: fixed; top: 60px; right: 50px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 40px;">s</div>
+    
+<div style="position: fixed; top: 10px; left: 10px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 20px;">Punkty: </div>
+<div id="licznik" style="position: fixed; top: 10px; left: 110px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 20px;"></div>
+<div style="position: fixed; top: 40px; left: 10px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 20px;">Prędkość: </div>
+<div id="speed" style="position: fixed; top: 40px; left: 110px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 20px;"></div>
+<div style="position: fixed; top: 40px; left: 147px; z-index: 100; color: #000000; background-color: #ffffff; font-size: 20px;">km/h</div>
+
+
+<button class="open-button" onclick="openForm()">Open Form</button>
+<div class="form-popup" id="myForm">
+  <form action="/action_page.php" class="form-container">
+    <h1>Login</h1>
+
+    <label style="font-size: 20px" for="email"><b>Login</b></label>
+    <input type="text" placeholder="Enter Your Login" name="log" required>
+
+    <label style="font-size: 20px" for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Your Password" name="psw" required>
+
+    <button type="submit" class="btn">Confirm</button>
+    <button type="submit" class="btn cancel" onclick="closeForm()">Cancel</button>
+  </form>
+</div>
+
+    
+<script>
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+</script>
+</body>
+</html>
